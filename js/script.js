@@ -66,8 +66,9 @@ function createStars() {
 function createCouple() {
   const loader = new THREE.TextureLoader();
 
-  loader.load("assets/juntos.png", (texture) => {
+  loader.load("./assets/juntos.png", (texture) => {
     texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
 
     pareja = new THREE.Sprite(
       new THREE.SpriteMaterial({ map: texture, transparent: true })
@@ -85,9 +86,10 @@ function createCouple() {
 /* 🌼 FLORES */
 function createFlowerRain() {
   const loader = new THREE.TextureLoader();
-  const tex = loader.load("assets/flor.png");
 
+  const tex = loader.load("./assets/flor.png");
   tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
 
   for (let i = 0; i < 120; i++) {
     let f = new THREE.Sprite(
@@ -116,7 +118,7 @@ function resetFlower(f) {
 /* 💬 HISTORIA */
 function startStory() {
   const frases = [
-    "💛 Esto lo hice pensando en ti",
+    "Esto lo hice pensando en ti 💛",
     "Hola…",
     "No sabía cómo decirte esto…",
     "Pero quería hacer algo diferente…",
@@ -144,7 +146,6 @@ function startStory() {
     let x = cx + Math.cos(angle) * radiusX;
     let y = cy + Math.sin(angle) * radiusY;
 
-    /* 💛 frase principal */
     if (i === 0) {
       x = cx;
       y = cy + 180;
@@ -166,7 +167,6 @@ function startStory() {
 
     document.body.appendChild(div);
 
-    /* 💾 EDITOR + GUARDADO */
     makeDraggable(div, "frase_" + i);
 
     setTimeout(() => {
@@ -182,7 +182,7 @@ function startStory() {
   mostrar();
 }
 
-/* 💾 DRAG + AUTO GUARDADO */
+/* 💾 DRAG + GUARDADO */
 function makeDraggable(div, id) {
   let isDragging = false;
   let offsetX = 0;
@@ -192,7 +192,6 @@ function makeDraggable(div, id) {
   div.style.userSelect = "none";
   div.style.zIndex = 9999;
 
-  /* 🔄 CARGAR POSICIÓN SI EXISTE */
   const saved = localStorage.getItem(id);
   if (saved) {
     const pos = JSON.parse(saved);
@@ -219,7 +218,6 @@ function makeDraggable(div, id) {
     div.style.left = x + "px";
     div.style.top = y + "px";
 
-    /* 💾 GUARDADO EN TIEMPO REAL */
     localStorage.setItem(id, JSON.stringify({ x, y }));
   });
 
@@ -229,7 +227,7 @@ function makeDraggable(div, id) {
   });
 }
 
-/* ✨ BRILLO MOUSE */
+/* ✨ MOUSE SPARK */
 function createSpark(x, y) {
   let spark = document.createElement("div");
 
