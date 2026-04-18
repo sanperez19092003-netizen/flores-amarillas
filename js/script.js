@@ -1,8 +1,7 @@
 let scene, camera, renderer;
 let stars = [];
 let flowers = [];
-let pareja;
-let textos = [];
+let couple;
 
 let mouseX = 0;
 
@@ -18,22 +17,36 @@ document.getElementById("startScreen").onclick = () => {
 function init() {
   scene = new THREE.Scene();
 
+  const light = new THREE.PointLight(0xffd700, 1.5, 100);
+  light.position.set(2, 2, 5);
+  scene.add(light);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+
   camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
   );
-  camera.position.z = 5;
+
+  camera.position.z = 5.2;
 
   renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  /* 🖱️ MOUSE PC */
   document.addEventListener("mousemove", (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
     createSpark(e.clientX, e.clientY);
+  });
+
+  /* 📱 MOUSE MÓVIL */
+  document.addEventListener("touchmove", (e) => {
+    const t = e.touches[0];
+    mouseX = (t.clientX / window.innerWidth - 0.5) * 2;
+    createSpark(t.clientX, t.clientY);
   });
 
   createStars();
@@ -46,7 +59,7 @@ function init() {
 /* 🌌 ESTRELLAS */
 function createStars() {
   for (let i = 0; i < 300; i++) {
-    let star = new THREE.Mesh(
+    const star = new THREE.Mesh(
       new THREE.SphereGeometry(0.015),
       new THREE.MeshBasicMaterial({ color: 0xffffff })
     );
@@ -66,39 +79,31 @@ function createStars() {
 function createCouple() {
   const loader = new THREE.TextureLoader();
 
-  loader.load("./assets/juntos.png", (texture) => {
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-
-    pareja = new THREE.Sprite(
+  loader.load("./assets/juntos.png?v=1", (texture) => {
+    couple = new THREE.Sprite(
       new THREE.SpriteMaterial({ map: texture, transparent: true })
     );
 
     const aspect = texture.image.width / texture.image.height;
-    const h = 3.8;
-    const w = h * aspect;
+    couple.scale.set(3.4 * aspect, 3.4, 1);
 
-    pareja.scale.set(w, h, 1);
-    scene.add(pareja);
+    scene.add(couple);
   });
 }
 
 /* 🌼 FLORES */
 function createFlowerRain() {
   const loader = new THREE.TextureLoader();
-
-  const tex = loader.load("./assets/flor.png");
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
+  const tex = loader.load("./assets/flor.png?v=1");
 
   for (let i = 0; i < 120; i++) {
-    let f = new THREE.Sprite(
+    const f = new THREE.Sprite(
       new THREE.SpriteMaterial({ map: tex, transparent: true })
     );
 
     resetFlower(f);
 
-    let size = 0.15 + Math.random() * 0.2;
+    const size = 0.15 + Math.random() * 0.2;
     f.scale.set(size, size, 1);
 
     scene.add(f);
@@ -132,25 +137,23 @@ function startStory() {
   function mostrar() {
     if (i >= frases.length) return;
 
-    let div = document.createElement("div");
+    const div = document.createElement("div");
     div.innerText = frases[i];
 
-    let cx = window.innerWidth / 2;
-    let cy = window.innerHeight / 2;
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
 
-    let radiusX = 320;
-    let radiusY = 200;
-
-    let angle = (i / frases.length) * Math.PI * 2;
-
-    let x = cx + Math.cos(angle) * radiusX;
-    let y = cy + Math.sin(angle) * radiusY;
+    let x = cx;
+    let y;
 
     if (i === 0) {
-      x = cx;
-      y = cy + 180;
+      y = cy + 200;
       div.style.color = "#ffd700";
-      div.style.fontSize = "22px";
+      div.style.fontSize = "24px";
+    } else {
+      y = cy - 200 + i * 45;
+      div.style.color = "white";
+      div.style.fontSize = "18px";
     }
 
     div.style.position = "absolute";
@@ -158,22 +161,14 @@ function startStory() {
     div.style.top = y + "px";
     div.style.transform = "translate(-50%, -50%)";
 
-    div.style.color = i === 0 ? "#ffd700" : "white";
-    div.style.fontSize = i === 0 ? "22px" : "18px";
     div.style.opacity = "0";
-    div.style.transition = "opacity 1s";
+    div.style.transition = "opacity 1.2s";
     div.style.textShadow = "0 0 10px rgba(0,0,0,0.9)";
-    div.style.pointerEvents = "auto";
+    div.style.pointerEvents = "none";
 
     document.body.appendChild(div);
 
-    makeDraggable(div, "frase_" + i);
-
-    setTimeout(() => {
-      div.style.opacity = "1";
-    }, 100);
-
-    textos.push(div);
+    setTimeout(() => (div.style.opacity = "1"), 120);
 
     i++;
     setTimeout(mostrar, 2200);
@@ -182,78 +177,40 @@ function startStory() {
   mostrar();
 }
 
-/* 💾 DRAG + GUARDADO */
-function makeDraggable(div, id) {
-  let isDragging = false;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  div.style.cursor = "grab";
-  div.style.userSelect = "none";
-  div.style.zIndex = 9999;
-
-  const saved = localStorage.getItem(id);
-  if (saved) {
-    const pos = JSON.parse(saved);
-    div.style.left = pos.x + "px";
-    div.style.top = pos.y + "px";
-  }
-
-  div.addEventListener("mousedown", (e) => {
-    isDragging = true;
-
-    const rect = div.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-
-    div.style.cursor = "grabbing";
-  });
-
-  document.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-
-    let x = e.clientX - offsetX;
-    let y = e.clientY - offsetY;
-
-    div.style.left = x + "px";
-    div.style.top = y + "px";
-
-    localStorage.setItem(id, JSON.stringify({ x, y }));
-  });
-
-  document.addEventListener("mouseup", () => {
-    isDragging = false;
-    div.style.cursor = "grab";
-  });
-}
-
-/* ✨ MOUSE SPARK */
+/* ✨ BRILLO MOUSE ARREGLADO */
 function createSpark(x, y) {
-  let spark = document.createElement("div");
+  const spark = document.createElement("div");
 
   spark.style.position = "absolute";
   spark.style.left = x + "px";
   spark.style.top = y + "px";
-  spark.style.width = "6px";
-  spark.style.height = "6px";
-  spark.style.background = "gold";
+
+  spark.style.width = "16px";
+  spark.style.height = "16px";
+
+  spark.style.background =
+    "radial-gradient(circle, #fff6a0, #ffd700, transparent)";
+
   spark.style.borderRadius = "50%";
   spark.style.pointerEvents = "none";
-  spark.style.boxShadow = "0 0 10px gold, 0 0 20px rgba(255,215,0,0.6)";
+
+  spark.style.boxShadow =
+    "0 0 25px gold, 0 0 40px rgba(255,215,0,0.6)";
+
+  spark.style.opacity = "1";
+  spark.style.transition = "all 0.8s ease-out";
 
   document.body.appendChild(spark);
 
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     spark.style.opacity = "0";
-    spark.style.transform = "scale(2)";
-  }, 10);
+    spark.style.transform = "scale(2.8)";
+  });
 
-  setTimeout(() => {
-    spark.remove();
-  }, 1000);
+  setTimeout(() => spark.remove(), 900);
 }
 
-/* ✨ ANIMACIÓN */
+/* 🎥 ANIMACIÓN */
 function animate() {
   requestAnimationFrame(animate);
 
@@ -271,9 +228,9 @@ function animate() {
     if (f.position.y > 5) resetFlower(f);
   });
 
-  if (pareja) {
-    pareja.position.y = Math.sin(t) * 0.05;
-    pareja.position.x += (mouseX * 0.25 - pareja.position.x) * 0.05;
+  if (couple) {
+    couple.position.y = Math.sin(t) * 0.05;
+    couple.position.x += (mouseX * 0.25 - couple.position.x) * 0.05;
   }
 
   renderer.render(scene, camera);
