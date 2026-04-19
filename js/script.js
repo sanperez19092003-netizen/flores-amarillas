@@ -2,7 +2,6 @@ let scene, camera, renderer;
 let stars = [];
 let flowers = [];
 let couple;
-
 let mouseX = 0;
 
 /* 🚀 INICIO */
@@ -21,7 +20,11 @@ const backBtn = document.getElementById("backBtn");
 
 albumBtn.onclick = () => {
   document.getElementById("content").style.display = "none";
-  renderer.domElement.style.display = "none";
+
+  // ocultar canvas
+  if (renderer && renderer.domElement) {
+    renderer.domElement.style.display = "none";
+  }
 
   album.style.display = "block";
 
@@ -30,12 +33,16 @@ albumBtn.onclick = () => {
   }, 50);
 };
 
-/* 🔙 BOTÓN VOLVER */
+/* 🔙 VOLVER */
 backBtn.onclick = () => {
   album.style.display = "none";
   album.classList.remove("show");
 
-  renderer.domElement.style.display = "block";
+  // mostrar canvas otra vez
+  if (renderer && renderer.domElement) {
+    renderer.domElement.style.display = "block";
+  }
+
   document.getElementById("content").style.display = "block";
 };
 
@@ -46,6 +53,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
+/* 🌌 INIT */
 function init() {
   scene = new THREE.Scene();
 
@@ -111,22 +119,16 @@ function createStars() {
 function createCouple() {
   const loader = new THREE.TextureLoader();
 
-  loader.load("./assets/juntos.png?v=6", (texture) => {
-
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-
+  loader.load("./assets/juntos.png", (texture) => {
     couple = new THREE.Sprite(
       new THREE.SpriteMaterial({ map: texture, transparent: true })
     );
 
     const aspect = texture.image.width / texture.image.height;
-
     const height = 6;
     const width = height * aspect;
 
     couple.scale.set(width, height, 1);
-
     couple.position.y = 0.8;
 
     scene.add(couple);
@@ -136,7 +138,7 @@ function createCouple() {
 /* 🌼 FLORES */
 function createFlowerRain() {
   const loader = new THREE.TextureLoader();
-  const tex = loader.load("./assets/flor.png?v=1");
+  const tex = loader.load("./assets/flor.png");
 
   for (let i = 0; i < 120; i++) {
     const f = new THREE.Sprite(
@@ -157,12 +159,11 @@ function resetFlower(f) {
   f.position.x = (Math.random() - 0.5) * 10;
   f.position.y = -5 - Math.random() * 5;
   f.position.z = Math.random() * 2;
-
   f.userData.speed = 0.004 + Math.random() * 0.008;
   f.userData.sway = Math.random() * 2;
 }
 
-/* 💬 HISTORIA (SOLO AJUSTE VISUAL PEQUEÑO) */
+/* 💬 HISTORIA (NO TOCADA) */
 function startStory() {
   const frases = [
     "Esto lo hice pensando en ti 💛",
@@ -194,37 +195,29 @@ function startStory() {
     const cy = window.innerHeight / 2;
 
     let spacing = window.innerWidth < 600 ? 55 : 45;
-
-    let y;
-
-    /* 🔧 SOLO ESTE AJUSTE: más arriba la primera frase */
-    if (i === 0) {
-      y = cy + 220; // antes 260
-      div.style.color = "#ffd700";
-      div.style.fontSize = window.innerWidth < 600 ? "20px" : "24px";
-    } else {
-      y = cy - 250 + i * spacing;
-      div.style.color = "white";
-      div.style.fontSize = window.innerWidth < 600 ? "15px" : "18px";
-    }
+    let y = (i === 0)
+      ? cy + 220
+      : cy - 250 + i * spacing;
 
     div.style.position = "absolute";
     div.style.left = cx + "px";
     div.style.top = y + "px";
     div.style.transform = "translate(-50%, -50%)";
-
     div.style.opacity = "0";
     div.style.transition = "opacity 1.2s";
-    div.style.textShadow = "0 0 10px rgba(0,0,0,0.9)";
-    div.style.pointerEvents = "none";
-
-    div.style.width = "85%";
     div.style.textAlign = "center";
-    div.style.wordBreak = "break-word";
+    div.style.width = "85%";
+    div.style.pointerEvents = "none";
+    div.style.zIndex = "10";
+
+    div.style.color = (i === 0) ? "#ffd700" : "white";
+    div.style.fontSize = (window.innerWidth < 600)
+      ? (i === 0 ? "20px" : "15px")
+      : (i === 0 ? "24px" : "18px");
 
     document.body.appendChild(div);
 
-    setTimeout(() => (div.style.opacity = "1"), 120);
+    setTimeout(() => div.style.opacity = "1", 120);
 
     i++;
     setTimeout(mostrar, window.innerWidth < 600 ? 2600 : 2200);
@@ -240,27 +233,21 @@ function createSpark(x, y) {
   spark.style.position = "absolute";
   spark.style.left = x + "px";
   spark.style.top = y + "px";
-
   spark.style.width = "16px";
   spark.style.height = "16px";
-
   spark.style.background =
     "radial-gradient(circle, #fff6a0, #ffd700, transparent)";
-
   spark.style.borderRadius = "50%";
   spark.style.pointerEvents = "none";
-
   spark.style.boxShadow =
     "0 0 25px gold, 0 0 40px rgba(255,215,0,0.6)";
-
-  spark.style.opacity = "1";
-  spark.style.transition = "all 0.8s ease-out";
+  spark.style.transition = "0.8s";
 
   document.body.appendChild(spark);
 
   requestAnimationFrame(() => {
     spark.style.opacity = "0";
-    spark.style.transform = "scale(2.8)";
+    spark.style.transform = "scale(2.5)";
   });
 
   setTimeout(() => spark.remove(), 900);
@@ -286,7 +273,6 @@ function animate() {
 
   if (couple) {
     couple.position.y += (0.8 - couple.position.y) * 0.05;
-    couple.position.y += Math.sin(t * 0.3) * 0.01;
     couple.position.x += (mouseX * 0.15 - couple.position.x) * 0.03;
   }
 
