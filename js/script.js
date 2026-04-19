@@ -14,6 +14,38 @@ document.getElementById("startScreen").onclick = () => {
   animate();
 };
 
+/* 🔘 BOTÓN ÁLBUM */
+const albumBtn = document.getElementById("albumBtn");
+const album = document.getElementById("album");
+const backBtn = document.getElementById("backBtn");
+
+albumBtn.onclick = () => {
+  document.getElementById("content").style.display = "none";
+  renderer.domElement.style.display = "none";
+
+  album.style.display = "block";
+
+  setTimeout(() => {
+    album.classList.add("show");
+  }, 50);
+};
+
+/* 🔙 BOTÓN VOLVER */
+backBtn.onclick = () => {
+  album.style.display = "none";
+  album.classList.remove("show");
+
+  renderer.domElement.style.display = "block";
+  document.getElementById("content").style.display = "block";
+};
+
+/* 🎴 FLIP CARTAS */
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".card")) {
+    e.target.closest(".card").classList.toggle("flip");
+  }
+});
+
 function init() {
   scene = new THREE.Scene();
 
@@ -30,19 +62,19 @@ function init() {
     1000
   );
 
-  camera.position.z = 5.2;
+  camera.position.z = 5;
 
   renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+
   document.body.appendChild(renderer.domElement);
 
-  /* 🖱️ MOUSE PC */
   document.addEventListener("mousemove", (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
     createSpark(e.clientX, e.clientY);
   });
 
-  /* 📱 MOUSE MÓVIL */
   document.addEventListener("touchmove", (e) => {
     const t = e.touches[0];
     mouseX = (t.clientX / window.innerWidth - 0.5) * 2;
@@ -79,13 +111,23 @@ function createStars() {
 function createCouple() {
   const loader = new THREE.TextureLoader();
 
-  loader.load("./assets/juntos.png?v=1", (texture) => {
+  loader.load("./assets/juntos.png?v=6", (texture) => {
+
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+
     couple = new THREE.Sprite(
       new THREE.SpriteMaterial({ map: texture, transparent: true })
     );
 
     const aspect = texture.image.width / texture.image.height;
-    couple.scale.set(3.4 * aspect, 3.4, 1);
+
+    const height = 6;
+    const width = height * aspect;
+
+    couple.scale.set(width, height, 1);
+
+    couple.position.y = 0.8;
 
     scene.add(couple);
   });
@@ -120,22 +162,30 @@ function resetFlower(f) {
   f.userData.sway = Math.random() * 2;
 }
 
-/* 💬 HISTORIA */
+/* 💬 HISTORIA (SOLO AJUSTE VISUAL PEQUEÑO) */
 function startStory() {
   const frases = [
     "Esto lo hice pensando en ti 💛",
-    "Hola…",
-    "No sabía cómo decirte esto…",
-    "Pero quería hacer algo diferente…",
-    "Algo que te hiciera sonreír…",
-    "Porque tú haces eso conmigo…",
-    "Y no dejo de pensarte…"
+    "Hola Princesa… no sabía cómo decirte esto, así que lo hice de esta forma…",
+    "Quería hacerte algo diferente, algo que te hiciera sonreír…",
+    "Porque tú sigues siendo lo más especial para mí…",
+    "No te he podido olvidar… sé que cometí errores…",
+    "Y que te lastimé… te juro que cambie lo siento…",
+    "Quiero hacerlo mejor… quiero volver a intentarlo contigo…",
+    "No quiero perder lo nuestro… solo quiero una vida contigo…",
+    "Pero si ya no quieres, lo voy a entender… quiero verte feliz…",
+    "Solo quiero que sepas que te amo… y siempre te voy a amar…"
   ];
 
   let i = 0;
 
   function mostrar() {
-    if (i >= frases.length) return;
+    if (i >= frases.length) {
+      setTimeout(() => {
+        albumBtn.style.opacity = "1";
+      }, 1000);
+      return;
+    }
 
     const div = document.createElement("div");
     div.innerText = frases[i];
@@ -143,21 +193,23 @@ function startStory() {
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
 
-    let x = cx;
+    let spacing = window.innerWidth < 600 ? 55 : 45;
+
     let y;
 
+    /* 🔧 SOLO ESTE AJUSTE: más arriba la primera frase */
     if (i === 0) {
-      y = cy + 200;
+      y = cy + 220; // antes 260
       div.style.color = "#ffd700";
-      div.style.fontSize = "24px";
+      div.style.fontSize = window.innerWidth < 600 ? "20px" : "24px";
     } else {
-      y = cy - 200 + i * 45;
+      y = cy - 250 + i * spacing;
       div.style.color = "white";
-      div.style.fontSize = "18px";
+      div.style.fontSize = window.innerWidth < 600 ? "15px" : "18px";
     }
 
     div.style.position = "absolute";
-    div.style.left = x + "px";
+    div.style.left = cx + "px";
     div.style.top = y + "px";
     div.style.transform = "translate(-50%, -50%)";
 
@@ -166,18 +218,22 @@ function startStory() {
     div.style.textShadow = "0 0 10px rgba(0,0,0,0.9)";
     div.style.pointerEvents = "none";
 
+    div.style.width = "85%";
+    div.style.textAlign = "center";
+    div.style.wordBreak = "break-word";
+
     document.body.appendChild(div);
 
     setTimeout(() => (div.style.opacity = "1"), 120);
 
     i++;
-    setTimeout(mostrar, 2200);
+    setTimeout(mostrar, window.innerWidth < 600 ? 2600 : 2200);
   }
 
   mostrar();
 }
 
-/* ✨ BRILLO MOUSE ARREGLADO */
+/* ✨ BRILLO */
 function createSpark(x, y) {
   const spark = document.createElement("div");
 
@@ -229,8 +285,9 @@ function animate() {
   });
 
   if (couple) {
-    couple.position.y = Math.sin(t) * 0.05;
-    couple.position.x += (mouseX * 0.25 - couple.position.x) * 0.05;
+    couple.position.y += (0.8 - couple.position.y) * 0.05;
+    couple.position.y += Math.sin(t * 0.3) * 0.01;
+    couple.position.x += (mouseX * 0.15 - couple.position.x) * 0.03;
   }
 
   renderer.render(scene, camera);
