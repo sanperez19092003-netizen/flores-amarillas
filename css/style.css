@@ -75,9 +75,10 @@ h1 {
   transform: scale(1);
 }
 
+/* 🔥 AQUÍ SE ARREGLÓ EL ESPACIO DEL TÍTULO */
 .album-title {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 70px;
   font-size: 32px;
   color: gold;
 }
@@ -149,11 +150,11 @@ h1 {
   font-size: 14px;
 }
 
-/* 🔙 BOTÓN VOLVER */
+/* 🔙 BOTÓN VOLVER (ajustado) */
 #backBtn {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: 15px;
+  left: 15px;
   padding: 10px 18px;
   border-radius: 15px;
   border: none;
@@ -164,7 +165,7 @@ h1 {
   z-index: 30;
 }
 
-/* 📱 MOBILE OPTIMIZADO */
+/* 📱 MOBILE */
 @media (max-width: 600px) {
 
   h1 {
@@ -177,14 +178,12 @@ h1 {
     padding: 14px 28px;
   }
 
-  /* 📸 2 COLUMNAS SOLO CELULAR */
   .album-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     padding: 12px;
   }
 
-  /* 🃏 TARJETAS MÁS GRANDES */
   .inner {
     height: 230px;
   }
@@ -198,7 +197,7 @@ h1 {
   }
 }
 
-/* 🌌 CANVAS FIX */
+/* 🌌 CANVAS */
 canvas {
   position: fixed;
   top: 0;

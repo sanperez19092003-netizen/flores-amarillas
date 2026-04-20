@@ -4,8 +4,13 @@ let flowers = [];
 let couple;
 let mouseX = 0;
 
-/* 🚀 INICIO */
+/* 🚀 INICIO + MÚSICA */
 document.getElementById("startScreen").onclick = () => {
+
+  const music = document.getElementById("music");
+  music.volume = 0.6;
+  music.play().catch(() => {});
+
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("content").style.display = "block";
 
@@ -21,7 +26,6 @@ const backBtn = document.getElementById("backBtn");
 albumBtn.onclick = () => {
   document.getElementById("content").style.display = "none";
 
-  // ocultar canvas
   if (renderer && renderer.domElement) {
     renderer.domElement.style.display = "none";
   }
@@ -38,7 +42,6 @@ backBtn.onclick = () => {
   album.style.display = "none";
   album.classList.remove("show");
 
-  // mostrar canvas otra vez
   if (renderer && renderer.domElement) {
     renderer.domElement.style.display = "block";
   }
@@ -46,7 +49,7 @@ backBtn.onclick = () => {
   document.getElementById("content").style.display = "block";
 };
 
-/* 🎴 FLIP CARTAS */
+/* 🎴 FLIP */
 document.addEventListener("click", (e) => {
   if (e.target.closest(".card")) {
     e.target.closest(".card").classList.toggle("flip");
@@ -163,19 +166,19 @@ function resetFlower(f) {
   f.userData.sway = Math.random() * 2;
 }
 
-/* 💬 HISTORIA (NO TOCADA) */
+/* 💬 HISTORIA (MODIFICACIÓN AQUÍ) */
 function startStory() {
   const frases = [
     "Esto lo hice pensando en ti 💛",
-    "Hola Princesa… no sabía cómo decirte esto, así que lo hice de esta forma…",
+    "Hola Princesa. No sabía cómo decirte esto, así que lo hice de esta forma…",
     "Quería hacerte algo diferente, algo que te hiciera sonreír…",
     "Porque tú sigues siendo lo más especial para mí…",
-    "No te he podido olvidar… sé que cometí errores…",
-    "Y que te lastimé… te juro que cambie lo siento…",
-    "Quiero hacerlo mejor… quiero volver a intentarlo contigo…",
-    "No quiero perder lo nuestro… solo quiero una vida contigo…",
-    "Pero si ya no quieres, lo voy a entender… quiero verte feliz…",
-    "Solo quiero que sepas que te amo… y siempre te voy a amar…"
+    "No te he podido olvidar. Sé que cometí errores…",
+    "Y que te lastimé te juro que cambie. Lo siento…",
+    "Quiero hacer las cosas bien. Déjame intentarlo otra vez…",
+    "No quiero perder lo nuestro. Sueño con una vida a tu lado…",
+    "Pero si no quieres, lo entiendo. Solo quiero verte feliz…",
+    "Que sepas que te amo y siempre te voy a amar…"
   ];
 
   let i = 0;
@@ -194,10 +197,23 @@ function startStory() {
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
 
-    let spacing = window.innerWidth < 600 ? 55 : 45;
-    let y = (i === 0)
-      ? cy + 220
-      : cy - 250 + i * spacing;
+    let spacing = window.innerWidth < 600 ? 65 : 50;
+
+    let y;
+
+    if (i === 0) {
+      // 🔥 POSICIÓN SOBRE EL BOTÓN
+      const btn = document.getElementById("albumBtn");
+      const rect = btn.getBoundingClientRect();
+
+      y = rect.top - 40;
+    } else {
+      if (window.innerWidth < 600) {
+        y = cy - 180 + i * spacing;
+      } else {
+        y = cy - 250 + i * spacing;
+      }
+    }
 
     div.style.position = "absolute";
     div.style.left = cx + "px";
