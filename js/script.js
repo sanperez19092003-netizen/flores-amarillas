@@ -198,7 +198,7 @@ function startStory() {
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
 
-    let spacing = window.innerWidth < 600 ? 52 : 45;
+    let spacing = window.innerWidth < 600 ? 47 : 45;
 
     let y;
 
