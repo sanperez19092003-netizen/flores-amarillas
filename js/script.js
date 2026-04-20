@@ -166,7 +166,7 @@ function resetFlower(f) {
   f.userData.sway = Math.random() * 2;
 }
 
-/* 💬 HISTORIA (MODIFICACIÓN AQUÍ) */
+/* 💬 HISTORIA (ÚNICO ARREGLO AQUÍ) */
 function startStory() {
   const frases = [
     "Esto lo hice pensando en ti 💛",
@@ -201,18 +201,25 @@ function startStory() {
 
     let y;
 
-    if (i === 0) {
-      // 🔥 POSICIÓN SOBRE EL BOTÓN
-      const btn = document.getElementById("albumBtn");
-      const rect = btn.getBoundingClientRect();
+    if (window.innerWidth < 600) {
+      // 📱 CELULAR
 
-      y = rect.top - 40;
-    } else {
-      if (window.innerWidth < 600) {
-        y = cy - 180 + i * spacing;
+      if (i === 0) {
+        // 🔥 FRASE AMARILLA ABAJO
+        const btn = document.getElementById("albumBtn");
+        const rect = btn.getBoundingClientRect();
+        y = rect.top - 30;
       } else {
-        y = cy - 250 + i * spacing;
+        // 🔥 FRASES DESDE ARRIBA (DEBAJO DEL TÍTULO)
+        y = 80 + (i * spacing);
       }
+
+    } else {
+      // 💻 PC (sin cambios)
+
+      y = (i === 0)
+        ? cy + 250
+        : cy - 250 + i * spacing;
     }
 
     div.style.position = "absolute";
