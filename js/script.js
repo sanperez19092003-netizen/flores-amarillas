@@ -166,7 +166,7 @@ function resetFlower(f) {
   f.userData.sway = Math.random() * 2;
 }
 
-/* 💬 HISTORIA (ÚNICO ARREGLO AQUÍ) */
+/* 💬 HISTORIA */
 function startStory() {
   const frases = [
     "Esto lo hice pensando en ti 💛",
@@ -178,7 +178,8 @@ function startStory() {
     "Quiero hacer las cosas bien. Déjame intentarlo otra vez…",
     "No quiero perder lo nuestro. Sueño con una vida a tu lado…",
     "Pero si no quieres, lo entiendo. Solo quiero verte feliz…",
-    "Que sepas que te amo y siempre te voy a amar…"
+    "Que sepas que te amo y siempre te voy a amar…",
+    "Eres esa luz en mi vida ♥️",
   ];
 
   let i = 0;
@@ -197,26 +198,19 @@ function startStory() {
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
 
-    let spacing = window.innerWidth < 600 ? 65 : 50;
+    let spacing = window.innerWidth < 600 ? 40 : 45;
 
     let y;
 
     if (window.innerWidth < 600) {
-      // 📱 CELULAR
-
       if (i === 0) {
-        // 🔥 FRASE AMARILLA ABAJO
         const btn = document.getElementById("albumBtn");
         const rect = btn.getBoundingClientRect();
         y = rect.top - 30;
       } else {
-        // 🔥 FRASES DESDE ARRIBA (DEBAJO DEL TÍTULO)
         y = 80 + (i * spacing);
       }
-
     } else {
-      // 💻 PC (sin cambios)
-
       y = (i === 0)
         ? cy + 250
         : cy - 250 + i * spacing;
@@ -300,4 +294,41 @@ function animate() {
   }
 
   renderer.render(scene, camera);
+}
+
+/* 💛 MENSAJE OCULTO EN EL TÍTULO (AGREGADO) */
+const titulo = document.querySelector("#content h1");
+
+if (titulo) {
+  titulo.addEventListener("click", () => {
+
+    const mensaje = document.createElement("div");
+    mensaje.innerText = "Siempre vas a ser mi persona favorita 💛";
+
+    mensaje.style.position = "absolute";
+    mensaje.style.left = "50%";
+    mensaje.style.top = "60%";
+    mensaje.style.transform = "translate(-50%, -50%)";
+    mensaje.style.background = "rgba(0,0,0,0.7)";
+    mensaje.style.padding = "15px 25px";
+    mensaje.style.borderRadius = "15px";
+    mensaje.style.color = "gold";
+    mensaje.style.fontSize = "16px";
+    mensaje.style.textAlign = "center";
+    mensaje.style.zIndex = "50";
+    mensaje.style.opacity = "0";
+    mensaje.style.transition = "opacity 0.5s";
+
+    document.body.appendChild(mensaje);
+
+    setTimeout(() => {
+      mensaje.style.opacity = "1";
+    }, 50);
+
+    setTimeout(() => {
+      mensaje.style.opacity = "0";
+      setTimeout(() => mensaje.remove(), 500);
+    }, 3000);
+
+  });
 }
